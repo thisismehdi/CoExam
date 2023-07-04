@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title%} coexam | Question{%endblock%}
+
+{% block content%}
+<section class="examBody" id="examBody">
+    <h3 class="heading-primary margin-bottom-2">{{examName}}</h3>
+    <h3 class="heading-secondary margin-bottom-2">code d'examen: "{{examCode}}"</h3>
+    <hr>
+
+</section>
+{% csrf_token%}
+{% endblock %}
+
+{% block javascript %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    const examBody = document.getElementById('examBody')
+    const examId = "{{examId}}"
+    const csrftoken = document.getElementsByName('csrfmiddlewaretoken')[0].value
+    $.ajax({
+        type:'GET',
+        // the id of the exam
+        url:`/get-exam/${examId}`,
+        success:function(response){
+            console.log('succes')
+            const quiz = response.data
+            quiz.forEach((question,index) => {
+                const div = document.createElement('div')
+            div.classList.add('examBody__question')
+            div.innerHTML = `<div class="form__group">
+                            <label class="form__label">question ${index}</label>
+                            <input type="text" class="examBody__question__Title form__input" value="${question.question}">
+                            </div>
+                            <ul class="examBody__choices">
+                            <li class="examBody__choice">
+                            <div class="form__group">
+                            <label class="form__label">choix 1 :</label>
+                            <input type="text" class="examBody__question__Title form__input" value="${question.a}">
+                            </div>
+                            </li>      
+
+                            <li class="examBody__choice">
+                            <div class="form__group">
+                            <label class="form__label">choix 2 :</label>
+                            <input type="text" class="examBody__question__Title form__input" value="${question.a}">
+                            </div>
+                            </li> 
+
+                            <li class="examBody__choice">
+                            <div class="form__group">
+                            <label class="form__label">choix 3 :</label>
+                            <input type="text" class="examBody__question__Title form__input" value="${question.a}">
+                            </div>
+                            </li> 
+
+                            <li class="examBody__choice">
+                            <label for="answer" class="form__label">Correct answer :</label>
+                                <select name="answer" id="answer-choices" class="form__select">
+                                    <option value="A" >A</option>
+                                    <option value="B" checked>B</option>
+                                    <option value="C">C</option>
+                                    <option value="D">D</option>
+                                </select>
+                            </li> 
+                            </ul>`
+                examBody.append(div)
+            });
+        },
+        error:function(error){
+            console.log("error")
+        }
+    })
+</script>
+{%endblock%}

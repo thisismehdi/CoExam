@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title%}
+CoExam | Signup teacher
+{%endblock%}
+
+{% block content%}
+<section class="signup">
+    <div class="form-container">
+        <form class="form margin-bottom-2" method="POST">
+            <h2 class="heading-secondary margin-bottom-2">s'inscrire Professeur</h2>
+            {% csrf_token %}
+            <!------------------showing error message-------------------->
+            {% if messages %}
+                        {% for message in messages %}
+                        <div class="msg msg__error">{{message}}</div>
+                        {% endfor %}
+            {% endif %}
+
+            <!--first name-->
+            <div class="form__group">
+              <label for="first_name" class="form__label">Prenom  :</label>
+              <input class="form__input" type="text" id="first_name" name="first_name" required>
+            </div>
+            <!--password-->
+            <div class="form__group">
+                <label for="last_name" class="form__label">Nom :</label>
+                <input class="form__input" type="text" id="last_name" name="second_name"required>
+              </div>
+              
+              
+              <div class="form__group">
+                <label for="email" class="form__label">Email :</label>
+                <input class="form__input" type="email" id="email" name="email" required>
+              </div>
+             
+              <div class="form__group">
+                <label for="password1" class="form__label">mot de passe :</label>
+                <input class="form__input" type="password" id="password1" name="password1" required>
+              </div>
+              <div class="form__group">
+                <label for="password2" class="form__label">confirmer le mot de passe :</label>
+                <input class="form__input" type="password" id="password2" name="password2" required>
+              </div>
+              
+            <button type="submit" class="form__submit">s'inscrire</button>
+          </form>
+          <div class="u-center-text">
+            <a href="#">connecter si vous avaez deja un compte?</a>
+          </div>
+      </div>
+</section>
+{% endblock %}

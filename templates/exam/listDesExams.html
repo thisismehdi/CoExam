@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title%} coexam | liste des exams {%endblock%}
+
+{% block css%}
+<style>
+    .overlay_delete{
+        position: absolute;
+        background-color: rgba(0,0,0,.7) !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100vw;
+        height: calc(100vh - 8rem);
+        z-index: 100000 !important;
+    }
+
+    .danger{
+        background-color: firebrick !important;
+    }
+    .white{
+        color: white;
+    }
+    .btnDelete{
+        display: inline-block;
+        padding:1rem 2rem;
+        border-radius: .5rem;
+        color: white;
+        font-size: 1.6rem;
+        text-decoration: none;
+        transition: all .3s;
+        background-color: rgba(27, 128, 141, 0.979);
+    }
+    .btnDelete:hover{
+        transform: scale(1.2);
+    }
+    .hidden{
+        display: none !important;
+    }
+</style>
+{%endblock css%}
+
+{% block content%}
+<div class="overlay_delete hidden" id="overlay">
+    <h2 class="heading-secondary margin-bottom-2 white">êtes-vous sûr de supprimer cet examen?</h2>
+    <div>
+        <a href="#" class="btnDelete danger" id="oui">Oui</a>
+        &nbsp;
+        &nbsp;
+        &nbsp;
+        <a href="#" class="btnDelete" id="non">non</a>
+    </div>
+</div>
+
+<section class="exams__list">
+    {% if exams.count %}
+    <ul class="exams__list__group">
+        {% for exam in exams %}
+        <li class="exams__list__item">
+            <a href="/exam/{{exam.id}}">{{exam.title}}</a>
+            <i class="far fa-trash-alt deleteBtn" id="{{exam.id}}"></i>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <h2 class="heading-secondary">aucun examens à afficher</h2>
+    {% endif %}
+
+</section>
+{% csrf_token %}
+
+
+{% endblock %}
+
+{% block javascript%}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    const deleteBtns = document.querySelectorAll('.deleteBtn')
+    const csrftoken = document.getElementsByName('csrfmiddlewaretoken')[0].value
+    const btnOui = document.getElementById('oui')
+    const btnNon = document.getElementById('non')
+    const overlay = document.getElementById('overlay')
+    // les buttons
+    console.log(deleteBtns)
+    // les buttons de supprimation
+    deleteBtns.forEach((btn)=>{
+        btn.addEventListener('click',()=>{
+            console.log('what')
+            const idBtn = btn.getAttribute('id')
+            // si oui
+            overlay.classList.remove('hidden')
+            overlay.classList.add('show')
+            btnOui.addEventListener('click',(e)=>{
+                e.preventDefault()
+                $.ajax({
+                    type:'POST',
+                    url:`/cancel-exam/${idBtn}`,
+                    data:{
+                        'csrfmiddlewaretoken':csrftoken,
+                    },
+                    success:function(response){
+                        console.log('succes')
+                        document.location.reload()
+                    },
+                    error:function(error){
+                        console.log("error")
+                    }
+                })
+                overlay.classList.add('hidden')
+            })
+            // si non
+            btnNon.addEventListener('click',(e)=>{
+                e.preventDefault()
+                overlay.classList.add('hidden')
+            })
+            
+        })
+    })
+</script>
+{% endblock javascript %}

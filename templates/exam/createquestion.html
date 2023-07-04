@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    coexam | question
+{%endblock%}
+{% block content%}
+
+{% block css %}
+<style>
+    .green{
+        background-color: rgb(128, 207, 49) !important;
+    }
+
+    .red{
+        background-color: rgb(206, 23, 23) !important;
+    }
+
+    .hidden{
+        display: none !important;
+    }
+</style>
+{%endblock%}
+<section class="questions">
+    <div class="form-container">
+        <!--
+            action="{% url 'createQuestion' idexam %}"
+        -->
+        <form class="form" method="POST" id="create-form">
+            {% csrf_token %}
+            <h2 class="heading-secondary margin-bottom-2">Create question</h2>
+            <input type="text" name="question" id="question" placeholder="Enter You're question" class="form__input">
+            <input type="text" name="A" id="answer-A" placeholder="Enter choice number 1" class="form__input">
+            <input type="text" name="B" id="answer-B" placeholder="Enter choice number 2" class="form__input">
+            <input type="text" name="C" id="answer-C" placeholder="Enter choice number 3" class="form__input">
+            <input type="text" name="D" id="answer-D" placeholder="Enter choice number 4" class="form__input">
+            <label for="answer" class="form__label">Correct answer :</label>
+            <select name="answer" id="answer-choices" class="form__select">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+            </select>
+            <div class="form__buttons">
+                <button type="submit" data-exam-id="{{idexam}}" id="btn-submit" class="form__btn">Creer</button>
+            </div>
+        </form>
+        
+    </div>
+    <div id="btns">
+        <a data-id-exam="{{idexam}}" class="btn red" href="/createexam" id="cancel-form">cancel</a>
+        <a class="btn green hidden" href="/listDesExams/" id="terminer">Terminer</a>
+    </div>
+</section>
+{%endblock%}
+
+{% block javascript%}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        const form = document.getElementById('create-form')
+        const question = $('#question')
+        const answer_A = $('#answer-A')
+        const answer_B = $('#answer-B')
+        const answer_C = $('#answer-C')
+        const answer_D = $('#answer-D')
+        const choices = $('#answer-choices')
+        const csrftoken = document.getElementsByName('csrfmiddlewaretoken')[0].value
+        const idexam = $('#btn-submit').attr('data-exam-id')
+        const cancel_exam = document.getElementById('cancel-form')
+        form.addEventListener('submit',(e)=>{
+            console.log('INSIDE')
+            e.preventDefault()
+            $.ajax({
+                type:'POST',
+                url:`/createQuestion/${idexam}`,
+                data:{
+                    'csrfmiddlewaretoken':csrftoken,
+                    'question':question.val(),
+                    'answerA':answer_A.val(),
+                    'answerB':answer_B.val(),
+                    'answerC':answer_C.val(),
+                    'answerD':answer_D.val(),
+                    'correctAnswer':choices.val()
+                },
+                success:function(response){
+                    console.log(response)
+                    if(response.count > 3){
+                        document.getElementById('terminer').classList.remove("hidden")
+                    }
+                },
+                error:function(error){
+                    console.log("moxkiiil")
+                }
+            })
+            form.reset()
+        })
+
+        ////cancel exam
+        cancel_exam.addEventListener('click',(e)=>{
+            e.preventDefault();
+            $.ajax({
+                type:'POST',
+                url:`cancel-exam/${idexam}`,
+                data:{
+                    'csrfmiddlewaretoken':csrftoken,
+                },
+                success:function(response){
+                    console.log(response)
+                },
+                error:function(error){
+                    console.log(error)
+                }
+            })
+            window.location.href = "http://127.0.0.1:8000/createexam";
+        })
+    </script>
+{% endblock javascript%}

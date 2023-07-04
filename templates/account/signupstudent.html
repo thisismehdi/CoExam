@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title%} CoExam|Signup student{%endblock%}
+
+{% block content%}
+<section class="signup">
+    <div class="form-container">
+        <form class="form margin-bottom-2" method="POST" enctype=multipart/form-data>
+            <h2 class="heading-secondary margin-bottom-2">s'inscrire comme étudiant</h2>
+            {% csrf_token %}
+
+            <!------------------showing error message-------------------->
+            {% if messages %}
+                        {% for message in messages %}
+                        <div class="msg msg__error">{{message}}</div>
+                        {% endfor %}
+            {% endif %}
+            <!--first name-->
+            <div class="form__group">
+              <label for="first_name" class="form__label">prenom :</label>
+              <input class="form__input" type="text" id="first_name" name="first_name">
+            </div>
+            <!--second name-->
+            <div class="form__group">
+                <label for="last_name" class="form__label">nom :</label>
+                <input class="form__input" type="text" id="last_name" name="second_name">
+              </div>
+              <!--email-->
+              <div class="form__group">
+                <label for="email" class="form__label">Email :</label>
+                <input class="form__input" type="email" id="email" name="email">
+              </div>
+
+              <!--Cne-->
+              <div class="form__group">
+                <label for="cne" class="form__label">CNE :</label>
+                <input class="form__input" type="text" id="cne" name="cne">
+              </div>
+
+              <div class="form__group">
+                <label for="img" class="form__label">Upload image:</label>
+                <input  type="file" id="image" accept="image/*" name="image">
+              </div>
+              <div class="form__group">
+                <label for="password1" class="form__label">mot de passe :</label>
+                <input class="form__input" type="password" id="password1" name="password1">
+              </div>
+              <div class="form__group">
+                <label for="password2" class="form__label">confirmer le mot de passe :</label>
+                <input class="form__input" type="password" id="password2" name="password2">
+              </div>
+              
+            <button type="submit" class="form__submit">Submit</button>
+          </form>
+          <div class="u-center-text">
+            <a href="#">connctez vois si vous posséedez déjà un compte?</a>
+          </div>
+      </div>
+</section>
+{% endblock %}

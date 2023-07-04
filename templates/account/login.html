@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title%} CoExam | connexion {%endblock%} <!--defining the title of the page-->
+
+{% block content%}<!--add the content to the page-->
+<section class="signup">
+    <div class="form-container">
+        <form class="form margin-bottom-2" method="POST">
+            <h2 class="heading-secondary margin-bottom-2">Connexion</h2>
+            <!------------------showing error message-------------------->
+            {% if messages %}
+                        {% for message in messages %}
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                        <div class="msg msg__error">{{message}}</div>
+                        {% else %}
+                        <div class="msg msg__succes">{{message}}</div>
+                        {% endif %}
+                        {% endfor %}
+            {% endif %}
+              {% csrf_token %}
+              <div class="form__group">
+                <label for="email" class="form__label">Email :</label>
+                <input class="form__input" type="email" id="email" name="email" required>
+              </div>
+             
+              <div class="form__group">
+                <label for="password" class="form__label">Mot de passe :</label>
+                <input class="form__input" type="password" id="password" name="password" required>
+              </div>
+              
+            <button type="submit" class="form__submit">Submit</button>
+          </form>
+
+          <div>
+            <a href="#"><i class="fas fa-key"></i> Mot de passe oubliè</a>
+          </div>
+    </div>
+</section>
+{%endblock%}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

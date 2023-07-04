@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% block title%} coexam | Passer Exam {%endblock%}
+{% load static %}
+
+{% block css%}
+<style>
+    #video{
+        border-radius: 50%;
+    }
+
+    .container{
+        width: fit-content;
+        height: fit-content;
+        padding: 0;
+        position: relative;
+    }
+
+    canvas{
+        position: absolute;
+        left: 0;
+        top:0;
+    }
+    .errors{
+        display: flex;
+        flex-direction: column;
+    }
+    #error-text{
+        color: transparent;
+    }
+   
+</style>
+{%endblock%}
+{% block content%}
+
+<img src="/media/{{imageUrl}}" alt="" width="400" id="myFace" class="d-none">
+<section class="pass-quiz flex__container">
+    <div class="erros">
+        
+        <div class="container" id="container">
+            <video id="video" width="220" height="220" autoplay muted></video>
+        </div>
+        <div class="error u-center-text">
+            <h1 class="heading-primary" id="error-text">some error messsage</h1>
+        </div>
+        <div id="timer" class="d-none">
+            21:21
+        </div>
+    </div>
+    <div class="quiz-container d-none" id="quiz" >
+        <div class="quiz-header"> 
+        <h2 id="question" class="heading-secondary">Question text</h2>     
+        <ul>
+            <li>
+                <input type="radio" name="answer" id="a"
+                class="answer">
+                <label for="a" id="a_text">Question</label>
+            </li>
+            
+            <li>
+                <input type="radio" name="answer" id="b"
+                class="answer">
+                <label for="b" id="b_text">Question</label>
+            </li>
+
+            <li>
+                <input type="radio" name="answer" id="c"
+                class="answer">
+                <label for="c" id="c_text">Question</label>
+            </li>
+
+            <li>
+                <input type="radio" name="answer" id="d"
+                class="answer">
+                <label for="d" id="d_text">Question</label>
+            </li> 
+        </ul>
+        </div>
+        <button id="submit">Submit</button>
+    </div>
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</section>
+{% csrf_token %}
+{%endblock%}
+
+{% block javascript %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+//
+<script>
+    // the id of the exam that the student gonna pass
+    let idExam = "{{code}}"
+    // the src of the user image
+    let imageUrl = "{{imageUrl}}"
+    // the name of the currrent user
+    let name = "{{name}}"
+    // the id of the student
+    let idStudent = "{{idStudent}}"
+    console.log('idStudent',idStudent)
+</script>
+<!--the script responsible for the exam -->
+<script src="{% static 'js/exam.js'%}">
+</script>
+<!-- face api -->
+<script src="{% static 'js/face-api.min.js' %}">
+</script>
+
+<script>
+// error message 
+const error_text = document.getElementById('error-text')
+// the image of my face
+const myFace = document.getElementById('myFace')
+// the video stream
+const video = document.getElementById("video")
+// the container of the video
+const container = document.getElementById('container')
+// number of total detections
+let count = 0
+// number of succes detections
+let detectFine = 0
+// number of other faces
+let detectAnotherFace = 0
+// number of the times you move your face away from the camrea
+let noFace = 0
+// times when we detect other faces
+let multiFaces =0
+
+/////////change the there of the app based on the detections
+const changeTheme = (lengthDetect,iam=true)=>{
+    const  timer = document.getElementById('timer')
+    const submit = document.getElementById('submit')
+    let message
+    let color
+    let font
+    if(lengthDetect > 1){
+        color ='red'
+        font = 'red'
+        message ='plusiers visages detecter'
+    }else if(lengthDetect == 0 ){
+        color ='red'
+        font = 'red'
+        message ='aucun visage detecter'
+    }else{
+        if(iam){
+            color = 'blue'
+            message = 'dhsjkhkjdshgkjhsdg'
+            font = 'transparent'
+        }else{
+            color = 'red'
+            message = `you're not ${name}`
+            font = 'red'
+        }
+        
+    }
+
+    timer.style.backgroundColor=color
+    submit.style.backgroundColor=color
+    error_text.innerHTML=message
+    error_text.style.color=font
+
+}
+
+// this funtion start the vide streal and run the getExam fucntion
+const run = async()=>{
+            // get the stream
+            camera_stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            // assign it to the video elemnt
+            video.srcObject = camera_stream;
+            getExams();
+
+        }
+
+// feth the models
+Promise.all([
+    faceapi.nets.faceRecognitionNet.loadFromUri("{% static 'js/models' %}"),
+    faceapi.nets.faceLandmark68Net.loadFromUri("{% static 'js/models' %}"),
+    faceapi.nets.ssdMobilenetv1.loadFromUri("{% static 'js/models' %}")
+// then start the whle thing
+]).then(run)
+
+// when the video start 
+// we are going to start our face recongnition
+video.addEventListener('play',async ()=>{
+    // create a canvas for drawing
+    const canvas = faceapi.createCanvasFromMedia(video)
+    // get the video dimensions
+    const displaySize = { width: video.width, height: video.height}
+    // the descriptions of the current user face
+    const labeledFaceDescriptors = await userCurrentFace()
+    // initialize the matcher
+    const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6)
+    // match the dimension 
+    faceapi.matchDimensions(canvas,displaySize)
+    // add the anvas to the container note:that the canvas is posiotion absolutly relative to the container
+    container.append(canvas)
+    // detect every 100ms
+    setInterval(async()=>{
+        // detect all the faces infront of the camera
+        const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors()
+        // base on how many face in the camera we change the theme
+        if(detections.length==0){
+            changeTheme(detections.length)
+            noFace++
+            console.log("noface",noFace)
+        }else if(detections.length > 1){
+            changeTheme(detections.length)
+            multiFaces++
+            console.log("multiFAce",multiFaces)
+        }
+        else{
+            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
+            const resizedDetections = faceapi.resizeResults(detections,displaySize)
+            const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
+            results.forEach((result, i) => {
+            const box = resizedDetections[i].detection.box
+            const drawBox = new faceapi.draw.DrawBox(box, { label: result.toString() })
+            if(result.toString().includes('unknown'))
+            {
+                changeTheme(1,false);
+                detectAnotherFace++
+                console.log("anotherFace",detectAnotherFace)
+            }else{
+                changeTheme(1);
+                detectFine++
+                console.log("detectFine",detectFine)
+            }
+            drawBox.draw(canvas)
+            })
+        }
+        
+    },100)
+});
+
+function userCurrentFace() {
+  const labels = [name]
+  return Promise.all(
+    labels.map(async label => {
+      const descriptions = []
+      const myFaceDetetction = await faceapi.detectSingleFace(myFace).withFaceLandmarks().withFaceDescriptor()
+      descriptions.push(myFaceDetetction.descriptor)
+      return new faceapi.LabeledFaceDescriptors(label, descriptions)
+    })
+  )
+}
+</script>
+{% endblock %}

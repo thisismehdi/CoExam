@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title%} coexam | Question{%endblock%}
+
+{% block content%}
+<section class="exam flex__container">
+    <div class="form-container ">
+        <form method="POST" class="form">
+            {% if messages %}
+                        {% for message in messages %}
+                        <div class="msg msg__error">{{message}}</div>
+                        {% endfor %}
+            {% endif %}
+            {% csrf_token %}
+            <input type="text" id="exam" name="exam" placeholder="entrer le nom d'examen" class="form__input margin-bottom-2" >
+            <button type="submit" class="form__submit">Creer</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

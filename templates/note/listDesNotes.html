@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title%} coexam | liste des notes {%endblock%}
+
+
+{% block content%}
+<section class="note__list">
+    <h3 class="heading-primary margin-bottom-2">Mes Notes</h3>
+    {% if notes.count %}
+        <ul class="note__list__group">
+            {% for note in notes%}
+                {% if note.note >= 10%}
+                    <li class="note__list__item u-center-text">
+                        <a href="#">{{note.nomExam}} :<span class="valider">{{note.note}}</span></a>
+                    </li>
+                {% else %}
+                    <li class="note__list__item u-center-text">
+                        <a href="#">{{note.nomExam}} :<span class="ratt">{{note.note}}</span></a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <h2 class="heading-secondary">vouas avez passer aucun examen !</h2>
+    {% endif %}
+</section>
+{%endblock%}

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title%} CoExam |Landing page {%endblock%} <!--defining the title of the page-->
+{% block content%}<!--add the content to the page-->
+<section class="intro">
+    <div class="flex__container">
+        <div class="flex__split">
+            <img src="{% static 'img/landing-page.svg'%}" alt="" class="intro__img">
+        </div>
+        <div class="flex__split intro__content">
+            <h1 class="heading-primary">
+                examens online
+                <span class="heading-primary--sub">sans covid-19 dans votre esprit</span>
+            </h1>
+            <a href="#" class="btn" id="descover-btn">découvrir plus</a>
+        </div>
+    </div>
+</section>
+
+<section class="info" id="info">
+    <div class="flex__container">
+        <div class="flex__split info__box">
+            <ul class="info__list">
+                <h2 class="heading-secondary margin-bottom-2">l'étudiant peut :</h2>
+                <li><i class="fas fa-chevron-right"></i> passer un examen QCM</li>
+                <li><i class="fas fa-chevron-right"></i> voir sa note dans l'instant</li>
+                <li><i class="fas fa-chevron-right"></i> votre sécuritè est important pour nous</li>
+            </ul>
+        </div>
+        <div class="flex__split info__box">
+            <ul class="info__list">
+                <h2 class="heading-secondary margin-bottom-2">Professeur peut :</h2>
+                <li><i class="fas fa-chevron-right"></i> creer un examen</li>
+                <li><i class="fas fa-chevron-right"></i> ne se soucie pas de tromper les étudiants</li>
+                
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="register" id="register">
+    <div class="flex__container">
+        <div class="flex__split register__student register__box margin-bottom-2">
+            <img src="{% static 'img/student.svg'%}" alt="">
+            <div class="helper">
+                <a href="{% url 'studentreg' %}" class="btn">s'inscrire comme étudiant </a>
+            </div>
+        </div>
+        <div class="flex__split regitser__teacher register__box">
+            <img src="{% static 'img/teacher.svg' %}" alt="">
+            <div class="helper">
+                <a href="{% url 'teacherreg' %}" class="btn">s'inscrire comme professeur</a>
+            </div>
+        </div>
+    </div>
+</section>
+{%endblock%}
+    
+{% block javascript %}<!--add javascrpt to the page-->
+<script>
+    const descover_btn = document.getElementById('descover-btn')
+    const section_info = document.getElementById('info')
+    const register = document.getElementById('signup')
+    const register_section = document.getElementById('register')
+    
+    register.addEventListener('click',(e)=>{
+        e.preventDefault();
+        register_section.scrollIntoView({behavior:'smooth'});
+    })
+
+    descover_btn.addEventListener('click',(e)=>{
+        e.preventDefault();
+        section_info.scrollIntoView({behavior:'smooth'});
+    })
+</script>
+{% endblock %}
